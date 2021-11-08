@@ -9,7 +9,7 @@ class table(QWidget):
 
     def __init__(self):
         super(table, self).__init__()
-        uic.loadUi('table.ui', self)
+        uic.loadUi('./design/table.ui', self)
         self.modified = {}
         self.titles = None
         self.setupUi()
@@ -24,7 +24,7 @@ class table(QWidget):
 class terminal(QWidget):
     def __init__(self):
         super(terminal, self).__init__()
-        uic.loadUi('terminal.ui', self)
+        uic.loadUi('./design/terminal.ui', self)
         self.tableWidget.itemChanged.connect(self.item_changed)
         self.pushButton_3.clicked.connect(self.update)
         self.pushButton.clicked.connect(self.add)

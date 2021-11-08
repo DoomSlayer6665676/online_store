@@ -12,7 +12,7 @@ class MyWidget(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        uic.loadUi('box_office.ui', self)
+        uic.loadUi('./design/box_office.ui', self)
         self.openWidget = False
         self.pushButton.clicked.connect(self.cheque)
         self.action_9.triggered.connect(self.exit)
@@ -22,8 +22,8 @@ class MyWidget(QMainWindow):
         self.action_10.triggered.connect(self.show_table)
         self.action_8.triggered.connect(self.terminal)
         self.columns = list()
-        self.output = 'output.txt'
-        self.input = 'input.txt'
+        self.output = './txt_and_jpg/output.txt'
+        self.input = './txt_and_jpg/input.txt'
         self.ter = terminal()
         self.tab = table()
         self.IDD = Doom()
@@ -41,9 +41,12 @@ class MyWidget(QMainWindow):
         self.output = QFileDialog.getOpenFileName(
             self, 'Выбрать файл', 'output.txt',
             'файл (*.txt);;Все файлы (*)')[0]
-        f = open(self.output, 'w')
-        print(f.write(self.textBrowser.toPlainText() + '\n' + self.textBrowser_2.toPlainText()))
-        f.close()
+        try:
+            f = open(self.output, 'w')
+            print(f.write(self.textBrowser.toPlainText() + '\n' + self.textBrowser_2.toPlainText()))
+            f.close()
+        except FileNotFoundError:
+            print('файл не найден')
 
     def show_table(self):
         self.openWidget = True
@@ -101,11 +104,15 @@ class MyWidget(QMainWindow):
             if not result:
                 self.textBrowser.setText(MISSING_ELEMENT)
                 return
-            result = SELECT("*", TABLE_NAME, TABLE_COLUMNS[1:3],
-                            (self.columns[i][0], int(self.columns[i][1])), comparison_signs=('=', '>='))
+            try:
+                result = SELECT("*", TABLE_NAME, TABLE_COLUMNS[1:3],
+                                (self.columns[i][0], int(self.columns[i][1])), comparison_signs=('=', '>='))
+            except IndexError:
+                self.columns[i].append('1')
             if not result:
                 self.textBrowser.setText(LACK_OF_QUANTITY)
                 return
+            print(self.columns)
         for i in range(len(self.columns)):
             result = SELECT("*", TABLE_NAME, TABLE_COLUMNS[1:3],
                             (self.columns[i][0], int(self.columns[i][1])), comparison_signs=('=', '>='))
@@ -149,11 +156,16 @@ class MyWidget(QMainWindow):
         self.input = QFileDialog.getOpenFileName(
             self, 'Выбрать файл', 'input.txt',
             'файл (*.txt);;Все файлы (*)')[0]
-        inp = open(self.input, mode='rt')
-        a = list(map(lambda x: ' '.join(x), map(lambda x: x.split(), inp.readlines())))
-        inp.close()
-        self.textEdit.clear()
-        self.textEdit.setText(', '.join(a))
+        try:
+            inp = open(self.input, mode='rt')
+            a = list(map(lambda x: ' '.join(x), map(lambda x: x.split(), inp.readlines())))
+            inp.close()
+            self.textEdit.clear()
+            self.textEdit.setText(', '.join(a))
+        except FileNotFoundError:
+            print('файл не найден')
+        except UnboundLocalError:
+            print('файл не найден')
 
 
 def except_hook(cls, exception, traceback):
